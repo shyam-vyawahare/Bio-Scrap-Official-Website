@@ -38,11 +38,11 @@ export const serviceCards = [
     popular: false,
   },
   {
-    icon: BarChart3,
-    title: "Waste Analytics",
-    description: "Real-time tracking and detailed analytics dashboard to monitor your waste management and environmental impact.",
-    features: ["Live tracking dashboard", "Monthly impact reports", "Carbon footprint analysis", "Waste reduction insights"],
-    price: "From ₹299/month",
+    icon: Recycle,
+    title: "Scrap Collection",
+    description: "Efficient collection and recycling of various types of scrap materials for proper disposal and recycling.",
+    features: ["All types of scrap accepted", "Competitive pricing", "Free pickup service", "Environmentally responsible disposal"],
+    price: "From ₹0 (Free pickup)",
     popular: false,
   },
   {

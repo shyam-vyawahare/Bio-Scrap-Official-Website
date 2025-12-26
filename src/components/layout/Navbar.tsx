@@ -25,38 +25,29 @@ export function Navbar() {
   ];
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-card/95 backdrop-blur-md shadow-md py-3"
-          : "bg-transparent py-5"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-card/95 backdrop-blur-md shadow-md py-3"
       )}
     >
       <div className="container mx-auto px-4 lg:px-8">
         <nav className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group relative z-50">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                <Leaf className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-accent animate-pulse" />
+              <img
+                src="/images/Bioscrap.jpeg"
+                alt="Bioscrap Logo"
+                className="w-10 h-10 rounded-full object-cover border border-border/10"
+              />
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-accent animate-pulse border-2 border-background" />
             </div>
             <span className="text-xl font-serif font-bold text-foreground">
-              Bio-<span className="text-primary">Scrap</span>
+              <span className="text-primary">Bio</span>scrap
             </span>
           </Link>
 
@@ -97,7 +88,7 @@ export function Navbar() {
             <Button asChild variant="outline" className="relative">
               <Link to="/cart">
                 <ShoppingCart className="w-4 h-4 mr-2" />
-                <span>Cart</span>
+                <span>{t('nav.cart')}</span>
                 {itemCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
                     {itemCount}
@@ -106,17 +97,21 @@ export function Navbar() {
               </Link>
             </Button>
             <Button asChild variant="hero" size="default">
-              <Link to="/booking">Book Pickup</Link>
+              <Link to="/booking">{t('nav.bookPickup')}</Link>
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
+            className="lg:hidden p-2 rounded-md bg-background/80 backdrop-blur-sm border border-border hover:bg-accent transition-colors relative z-50"
             aria-label="Toggle menu"
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? (
+              <X className="w-6 h-6 text-foreground" />
+            ) : (
+              <Menu className="w-6 h-6 text-foreground" />
+            )}
           </button>
         </nav>
 
@@ -128,9 +123,9 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="lg:hidden overflow-hidden"
+              className="lg:hidden overflow-hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-md shadow-xl border-t border-border/50 z-40"
             >
-              <div className="py-6 space-y-4">
+              <div className="container mx-auto px-4 py-8 space-y-6">
                 {navLinks.map((link, index) => (
                   <motion.div
                     key={link.path}
@@ -143,7 +138,7 @@ export function Navbar() {
                       className={cn(
                         "block text-lg font-medium py-2 transition-colors",
                         location.pathname === link.path
-                          ? "text-primary"
+                          ? "text-primary font-bold"
                           : "text-foreground/80 hover:text-primary"
                       )}
                     >
@@ -155,10 +150,10 @@ export function Navbar() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="pt-4"
+                  className="pt-4 border-t border-border/50"
                 >
                   <Button asChild variant="hero" size="lg" className="w-full">
-                    <Link to="/booking">{t('navbar.bookPickup')}</Link>
+                    <Link to="/booking">{t('nav.bookPickup')}</Link>
                   </Button>
                 </motion.div>
               </div>

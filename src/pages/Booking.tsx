@@ -27,26 +27,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { containerSizes } from "@/data/containers";
-import LocationPicker from "@/components/location/LocationPicker";
+import { scrapWeights } from "@/data/weights";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-
-  const bookingSchema = z.object({
-    wasteType: z.string().optional(),
-    date: z.string().min(1, "Please select a date"),
-    timeSlot: z.string().min(1, "Please select a time slot"),
-    containerSize: z.string().optional(),
-    address: z.string().min(10, "Please enter your full address"),
-    city: z.string().min(2, "Please enter your city"),
-    pincode: z.string().min(5, "Please enter a valid pincode"),
-    name: z.string().min(2, "Please enter your name"),
-    email: z.string().email("Please enter a valid email"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
-    instructions: z.string().optional(),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-  });
-
-type BookingFormData = z.infer<typeof bookingSchema>;
 
 interface BookingProps {
   mode?: "waste" | "scrap";
@@ -59,6 +41,26 @@ export default function Booking({ mode = "waste" }: BookingProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [scrapTypes, setScrapTypes] = useState<string[]>([]);
+
+  const bookingSchema = z.object({
+    wasteType: z.string().optional(),
+    date: z.string().min(1, t("booking.validation.date", "Please select a date")),
+    timeSlot: z.string().min(1, t("booking.validation.timeSlot", "Please select a time slot")),
+    containerSize: z.string().optional(),
+    address: z.string().min(5, t("booking.validation.address", "Please enter your full address")),
+    city: z.string().min(2, t("booking.validation.city", "Please enter your city")),
+    pincode: z.string().regex(/^\d{6}$/, t("booking.validation.pincode", "Pincode must be exactly 6 digits")),
+    name: z.string().min(2, t("booking.validation.name", "Please enter your name")),
+    email: z.string().email(t("booking.validation.email", "Please enter a valid email")),
+    phone: z
+      .string()
+      .regex(/^[6-9]\d{9}$/, t("booking.validation.phone", "Please enter a valid 10-digit mobile number")),
+    instructions: z.string().optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+  });
+
+  type BookingFormData = z.infer<typeof bookingSchema>;
 
   const {
     register,
@@ -81,8 +83,6 @@ export default function Booking({ mode = "waste" }: BookingProps) {
       email: "",
       phone: "",
       instructions: "",
-      latitude: undefined,
-      longitude: undefined,
     },
   });
   const watchedValues = watch();
@@ -96,9 +96,9 @@ export default function Booking({ mode = "waste" }: BookingProps) {
   ];
 
   const timeSlots = [
-    { id: "morning", label: t('booking.schedule.morning', "Morning"), time: "8:00 AM - 12:00 PM" },
-    { id: "afternoon", label: t('booking.schedule.afternoon', "Afternoon"), time: "12:00 PM - 4:00 PM" },
-    { id: "evening", label: t('booking.schedule.evening', "Evening"), time: "4:00 PM - 8:00 PM" },
+    { id: "morning", label: t('booking.schedule.morning', "Morning"), time: t('booking.schedule.range.morning', "8:00 AM - 12:00 PM") },
+    { id: "afternoon", label: t('booking.schedule.afternoon', "Afternoon"), time: t('booking.schedule.range.afternoon', "12:00 PM - 4:00 PM") },
+    { id: "evening", label: t('booking.schedule.evening', "Evening"), time: t('booking.schedule.range.evening', "4:00 PM - 8:00 PM") },
   ];
 
   // container sizes for waste flow only
@@ -193,55 +193,72 @@ export default function Booking({ mode = "waste" }: BookingProps) {
 
   const onSubmit = async (data: BookingFormData) => {
     try {
-      // Prepare form data for submission
-      const formData = new FormData();
-      const timestamp = new Date().toISOString();
+      const pickupType = mode === "scrap" ? "Scrap Collection" : "Waste Collection";
+      const timeSlotLabels: Record<string, string> = {
+        morning: t('booking.schedule.range.morning', "8:00 AM - 12:00 PM"),
+        afternoon: t('booking.schedule.range.afternoon', "12:00 PM - 4:00 PM"),
+        evening: t('booking.schedule.range.evening', "4:00 PM - 8:00 PM"),
+      };
+      const scrapLabelMap: Record<string, string> = {
+        plastic: "Plastic",
+        paper: "Paper",
+        metal: "Metal",
+        electronics: "Electronics",
+        glass: "Glass",
+        fiber: "Fiber / Cloth",
+        rubber: "Rubber / Tires",
+        wood: "Wood",
+      };
+      const scrapWeightText =
+        mode === "scrap" && location.state?.weightKg
+          ? scrapWeights.find((w) => w.id === String(location.state.weightKg))?.label || ""
+          : "";
+      const params = new URLSearchParams();
+      params.append("entry.1767192312", pickupType);
       
-      // Add all form fields
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formData.append(key, String(value));
-        }
-      });
-      
-      // Add additional metadata
-      formData.append('timestamp', timestamp);
-      formData.append('service_type', mode);
-      formData.append('order_type', mode === 'waste' ? 'Bio-Waste Pickup' : 'Scrap Pickup');
-      if (mode === 'scrap') {
-        formData.append('scrap_items', scrapTypes.join(', '));
-        if (location.state?.weightKg) {
-          formData.append('weight', location.state.weightKg);
-        }
-      }
-
-      // Submit to FormSubmit
-      const response = await fetch('https://formsubmit.co/your-email@example.com', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        console.log('Form submitted successfully');
-        setIsSubmitted(true);
+      // Handle Scrap Types (multi-select)
+      if (mode === "scrap" && scrapTypes.length > 0) {
+        scrapTypes.forEach((id) => {
+          params.append("entry.1887300099", scrapLabelMap[id] || id);
+        });
       } else {
-        throw new Error('Form submission failed');
+        // Always send at least one entry, even if empty
+        params.append("entry.1887300099", "");
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+
+      params.append("entry.1116300774", scrapWeightText);
+      params.append("entry.1182830561", data.date);
+      params.append("entry.1703005937", timeSlotLabels[data.timeSlot] || data.timeSlot);
+      params.append("entry.787567804", data.address);
+      params.append("entry.1293599527", data.city);
+      params.append("entry.1038690936", data.pincode);
+      params.append("entry.725083768", data.name);
+      params.append("entry.1911832101", `+91${data.phone}`);
+      params.append("entry.1330318541", data.email);
+      params.append("entry.1782142757", data.instructions ?? "");
+      await fetch(
+        "https://docs.google.com/forms/d/e/1FAIpQLSck2cwxSCWLY6MVO1Tbo-fp-cFIK-r9c1gYLgYpzGjBONytpw/formResponse",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+          mode: "no-cors",
+        }
+      );
+      setIsSubmitted(true);
       toast({
-        title: "Error",
-        description: "Failed to submit the form. Please try again or contact support.",
+        title: t("booking.success.title", "Booking Confirmed!"),
+        description: t("booking.success.message", "We'll send you a confirmation email shortly."),
+      });
+    } catch (error) {
+      toast({
+        title: t("errors.title", "Error"),
+        description: t("errors.submit", "Failed to submit form. Please try again or contact support."),
         variant: "destructive",
       });
     }
-    toast({
-      title: t('booking.success.title', "Booking Confirmed!"),
-      description: t('booking.success.message', "We'll send you a confirmation email shortly."),
-    });
   };
 
   const selectedContainer = containerSizes.find(c => c.id === watchedValues.containerSize);
@@ -345,7 +362,12 @@ export default function Booking({ mode = "waste" }: BookingProps) {
                     "w-8 h-8 mx-auto mb-2",
                     watchedValues.containerSize === size.id ? "text-primary" : "text-muted-foreground"
                   )} />
-                  <h4 className="font-semibold text-foreground">{size.label}</h4>
+                  <h4 className="font-semibold text-foreground">
+                    {t(
+                      `booking.wasteType.${size.id === "commercial" ? "commercialSize" : size.id}`,
+                      size.label
+                    )}
+                  </h4>
                   <p className="text-sm text-muted-foreground">{size.capacity}</p>
                 </label>
               ))}
@@ -454,7 +476,7 @@ export default function Booking({ mode = "waste" }: BookingProps) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          className="space-y-8"
+          className="space-y-6"
         >
           <div>
             <h2 className="text-2xl font-serif font-bold text-foreground mb-2">
@@ -463,67 +485,51 @@ export default function Booking({ mode = "waste" }: BookingProps) {
             <p className="text-muted-foreground">{t('booking.location.subtitle', "Enter your pickup location details.")}</p>
           </div>
 
-          <div>
-            <Label htmlFor="address">{t('booking.location.address', "Full Address")}</Label>
-            <Textarea
-              id="address"
-              placeholder={t('booking.location.addressPlaceholder', "Enter your street address, building, floor...")}
-              rows={3}
-              {...register("address")}
-              className="mt-2"
-            />
-            {errors.address && (
-              <p className="text-sm text-destructive mt-1">{errors.address.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
             <div>
-              <Label htmlFor="city">{t('booking.location.city', "City")}</Label>
-              <Input
-                id="city"
-                placeholder={t('booking.location.cityPlaceholder', "City")}
-                {...register("city")}
-                className="mt-2"
+              <Label htmlFor="address">{t('booking.location.address', "Address")} <span className="text-destructive">*</span></Label>
+              <Textarea
+                id="address"
+                placeholder={t('booking.location.addressPlaceholder', "House/Flat No, Building Name, Street")}
+                rows={3}
+                {...register("address")}
+                className="mt-1.5"
               />
-              {errors.city && (
-                <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
+              {errors.address && (
+                <p className="text-sm text-destructive mt-1">{errors.address.message}</p>
               )}
             </div>
-            <div>
-              <Label htmlFor="pincode">{t('booking.location.pincode', "PIN Code")}</Label>
-              <Input
-                id="pincode"
-                placeholder="123456"
-                {...register("pincode")}
-                className="mt-2"
-              />
-              {errors.pincode && (
-                <p className="text-sm text-destructive mt-1">{errors.pincode.message}</p>
-              )}
-            </div>
-          </div>
 
-          <div className="rounded-2xl border border-border overflow-hidden">
-            <div className="p-4 bg-muted/40 border-b border-border">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">{t('booking.location.map', "Map Selection (optional)")}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="city">{t('booking.location.city', "City")} <span className="text-destructive">*</span></Label>
+                <Input
+                  id="city"
+                  placeholder={t('booking.location.cityPlaceholder', "City")}
+                  {...register("city")}
+                  className="mt-1.5"
+                />
+                {errors.city && (
+                  <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
+                )}
               </div>
-            </div>
-            <div className="p-4">
-              <LocationPicker
-                value={{
-                  lat: watch("latitude") || null,
-                  lng: watch("longitude") || null,
-                  address: watch("address") || "",
-                }}
-                onChange={(val) => {
-                  if (typeof val.lat === "number") setValue("latitude", val.lat);
-                  if (typeof val.lng === "number") setValue("longitude", val.lng);
-                  if (val.address) setValue("address", val.address);
-                }}
-              />
+              <div>
+                <Label htmlFor="pincode">{t('booking.location.pincode', "Pincode")} <span className="text-destructive">*</span></Label>
+                <Input
+                  id="pincode"
+                  placeholder={t('booking.location.pincodePlaceholder', "6 digits")}
+                  maxLength={6}
+                  {...register("pincode")}
+                  className="mt-1.5"
+                  onInput={(e) => {
+                    const target = e.currentTarget as HTMLInputElement;
+                    target.value = target.value.replace(/\D/g, "").slice(0, 6);
+                  }}
+                />
+                {errors.pincode && (
+                  <p className="text-sm text-destructive mt-1">{errors.pincode.message}</p>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -553,7 +559,7 @@ export default function Booking({ mode = "waste" }: BookingProps) {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   id="name"
-                  placeholder="John Doe"
+                  placeholder={t('booking.details.namePlaceholder', 'Your Name')}
                   {...register("name")}
                   className="pl-10"
                 />
@@ -564,13 +570,23 @@ export default function Booking({ mode = "waste" }: BookingProps) {
             </div>
             <div>
               <Label htmlFor="phone">{t('booking.details.phone', "Phone Number")}</Label>
-              <div className="relative mt-2">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <div className="relative mt-2 flex items-center">
+                <div className="absolute left-0 top-0 bottom-0 flex items-center px-3 border-r border-border bg-muted/20 text-muted-foreground font-medium rounded-l-md select-none">
+                  +91
+                </div>
                 <Input
                   id="phone"
-                  placeholder="+1 (555) 000-0000"
+                  type="tel"
+                  placeholder={t('booking.details.phonePlaceholder', 'XXXXXXXXXX')}
                   {...register("phone")}
-                  className="pl-10"
+                  className="pl-16"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={10}
+                  onInput={(e) => {
+                    const target = e.currentTarget as HTMLInputElement;
+                    target.value = target.value.replace(/\D/g, "").slice(0, 10);
+                  }}
                 />
               </div>
               {errors.phone && (
@@ -586,7 +602,7 @@ export default function Booking({ mode = "waste" }: BookingProps) {
               <Input
                 id="email"
                 type="email"
-                placeholder="john@example.com"
+                placeholder={t('booking.details.emailPlaceholder', 'Email')}
                 {...register("email")}
                 className="pl-10"
               />
@@ -597,10 +613,10 @@ export default function Booking({ mode = "waste" }: BookingProps) {
           </div>
 
           <div>
-            <Label htmlFor="instructions">{t('booking.details.instructions', "Special Instructions (Optional)")}</Label>
+            <Label htmlFor="instructions">{t('booking.details.instructions', "Special Instructions")} <span className="text-muted-foreground">({t('common.optional', 'optional')})</span></Label>
             <Textarea
               id="instructions"
-              placeholder={t('booking.details.instructionsPlaceholder', "Gate code, specific directions, etc.")}
+              placeholder={t('booking.details.instructionsPlaceholder', 'Additional instructions (optional)')}
               rows={3}
               {...register("instructions")}
               className="mt-2"
@@ -657,7 +673,7 @@ export default function Booking({ mode = "waste" }: BookingProps) {
                   </div>
                   <span
                     className={cn(
-                      "text-xs mt-2 font-medium text-center w-20 md:w-auto",
+                      "text-xs mt-2 font-medium text-center max-w-[90px] md:max-w-none whitespace-normal break-words leading-tight",
                       currentStep >= step.number ? "text-primary" : "text-muted-foreground"
                     )}
                   >
@@ -771,7 +787,7 @@ export default function Booking({ mode = "waste" }: BookingProps) {
               )}
             </div>
           </div>
-          <div className="flex gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               variant="hero"
               size="lg"

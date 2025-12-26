@@ -114,7 +114,7 @@ export default function ScrapContainer() {
                   key={type}
                   className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-primary/30 text-sm font-medium text-primary shadow-sm"
                 >
-                  {t(`scrapSelection.types.${type}.label`, type.charAt(0).toUpperCase() + type.slice(1))}
+                  {t(`scrapSelection.types.${type}`, type.charAt(0).toUpperCase() + type.slice(1))}
                 </span>
               ))}
             </div>
@@ -156,7 +156,7 @@ export default function ScrapContainer() {
                     selectedContainer === size.id ? "text-primary" : "text-muted-foreground"
                   )}
                 />
-                <h4 className="font-semibold text-foreground">{size.label}</h4>
+                <h4 className="font-semibold text-foreground">{t(`booking.wasteType.${size.id}`, size.label)}</h4>
                 <p className="text-sm text-muted-foreground">{size.capacity}</p>
               </label>
             ))}

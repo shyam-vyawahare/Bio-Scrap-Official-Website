@@ -16,9 +16,9 @@ export default function Receipt() {
   }, []);
 
   const timeSlots = [
-    { id: "morning", label: t('booking.schedule.morning', "Morning"), time: "8:00 AM - 12:00 PM" },
-    { id: "afternoon", label: t('booking.schedule.afternoon', "Afternoon"), time: "12:00 PM - 4:00 PM" },
-    { id: "evening", label: t('booking.schedule.evening', "Evening"), time: "4:00 PM - 8:00 PM" },
+    { id: "morning", label: t('booking.schedule.morning', "Morning"), time: t('booking.schedule.range.morning', "8:00 AM - 12:00 PM") },
+    { id: "afternoon", label: t('booking.schedule.afternoon', "Afternoon"), time: t('booking.schedule.range.afternoon', "12:00 PM - 4:00 PM") },
+    { id: "evening", label: t('booking.schedule.evening', "Evening"), time: t('booking.schedule.range.evening', "4:00 PM - 8:00 PM") },
   ];
 
   const timeSlotLabel = timeSlots.find(s => s.id === data.timeSlot)?.time || data.timeSlot || "";

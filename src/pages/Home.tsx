@@ -236,22 +236,25 @@ export default function Home() {
             </motion.div>
           </motion.div>
         </div>
+      </section>
 
-        {/* Enhanced Scroll Indicator */}
+      {/* Scroll Indicator - Moved outside hero section */}
+      <div className="relative bg-background hidden md:block">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col items-center py-8 -mt-8 relative z-10"
         >
-          <span className="text-sm text-primary-foreground/70 mb-2">Scroll to explore</span>
+          <span className="text-sm text-muted-foreground mb-2">{t('home.scrollExplore')}</span>
           <motion.div
-            className="w-10 h-16 rounded-full border-2 border-primary-foreground/30 flex items-start justify-center p-2"
+            className="w-10 h-16 rounded-full border-2 border-border flex items-start justify-center p-2"
             animate={{ 
               borderColor: [
-                'rgba(255, 255, 255, 0.2)', 
-                'rgba(255, 255, 255, 0.6)', 
-                'rgba(255, 255, 255, 0.2)'
+                'hsl(var(--border))', 
+                'hsl(var(--primary))', 
+                'hsl(var(--border))'
               ]
             }}
             transition={{ 
@@ -270,14 +273,16 @@ export default function Home() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="w-1.5 h-4 rounded-full bg-primary-foreground"
+              className="w-1.5 h-4 rounded-full bg-primary"
             />
           </motion.div>
         </motion.div>
-      </section>
+      </div>
 
       {/* Pickup Cards Section */}
-      <PickupCards />
+      <div className="relative z-20">
+        <PickupCards />
+      </div>
 
       {/* Features Section */}
       <section className="py-20 lg:py-32 bg-background">

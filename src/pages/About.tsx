@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Leaf,
   Target,
@@ -13,69 +14,70 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const values = [
-  {
-    icon: Leaf,
-    title: "Waste Management",
-    description: "Complete solutions for homes, shops, offices, and institutions.",
-  },
-  {
-    icon: Heart,
-    title: "Bio Products",
-    description: "Converting organic waste into valuable resources.",
-  },
-  {
-    icon: Target,
-    title: "Organic Compost",
-    description: "High-quality compost for healthier soil and plants.",
-  },
-  {
-    icon: Users,
-    title: "Clean India Mission",
-    description: "Contributing to a cleaner, greener India.",
-  },
-];
-
-const team = [
-  {
-    name: "Our Process",
-    role: "Step 1",
-    description: "Door-to-door collection on a fixed schedule",
-  },
-  {
-    name: "Our Process",
-    role: "Step 2",
-    description: "Proper segregation of wet and dry waste",
-  },
-  {
-    name: "Our Process",
-    role: "Step 3",
-    description: "Bio-processing of wet waste into organic compost",
-  },
-  {
-    name: "Our Process",
-    role: "Step 4",
-    description: "Recycling of plastic, metal, and other materials",
-  },
-];
-
-const milestones = [
-  { year: "Benefit", event: "Reduces soil and plastic pollution" },
-  { year: "Benefit", event: "Reduces waste going to landfills" },
-  { year: "Benefit", event: "Promotes reuse and recycling" },
-  { year: "Benefit", event: "Supports Swachh Bharat Abhiyan" },
-  { year: "Benefit", event: "Creates local green employment" },
-  { year: "Benefit", event: "Encourages circular economy" },
-];
-
-const impact = [
-  { value: "Clean", label: "Surroundings", icon: Recycle },
-  { value: "Door-to-Door", label: "Waste Pickup", icon: Globe },
-  { value: "No Bad", label: "Smell or Dumping", icon: TreeDeciduous },
-  { value: "Organic", label: "Bio-Compost", icon: Leaf },
-];
-
 export default function About() {
+  const { t } = useTranslation();
+
+  const values = [
+    {
+      icon: Leaf,
+      title: t("about.values.wasteManagement.title", "Waste Management"),
+      description: t("about.values.wasteManagement.description", "Complete solutions for homes, shops, offices, and institutions."),
+    },
+    {
+      icon: Heart,
+      title: t("about.values.bioProducts.title", "Bio Products"),
+      description: t("about.values.bioProducts.description", "Converting organic waste into valuable resources."),
+    },
+    {
+      icon: Target,
+      title: t("about.values.organicCompost.title", "Organic Compost"),
+      description: t("about.values.organicCompost.description", "High-quality compost for healthier soil and plants."),
+    },
+    {
+      icon: Users,
+      title: t("about.values.cleanIndia.title", "Clean India Mission"),
+      description: t("about.values.cleanIndia.description", "Contributing to a cleaner, greener India."),
+    },
+  ];
+
+  const team = [
+    {
+      name: t("about.team.member.name", "Our Process"),
+      role: t("about.team.member.role", { step: 1 }),
+      description: t("about.team.member.description1", "Door-to-door collection on a fixed schedule"),
+    },
+    {
+      name: t("about.team.member.name", "Our Process"),
+      role: t("about.team.member.role", { step: 2 }),
+      description: t("about.team.member.description2", "Proper segregation of wet and dry waste"),
+    },
+    {
+      name: t("about.team.member.name", "Our Process"),
+      role: t("about.team.member.role", { step: 3 }),
+      description: t("about.team.member.description3", "Bio-processing of wet waste into organic compost"),
+    },
+    {
+      name: t("about.team.member.name", "Our Process"),
+      role: t("about.team.member.role", { step: 4 }),
+      description: t("about.team.member.description4", "Recycling of plastic, metal, and other materials"),
+    },
+  ];
+
+  const milestones = (t("about.journey.milestones", { returnObjects: true }) as any[]).map((m: any) => ({
+    year: m.year,
+    event: m.event,
+  }));
+
+  const impact = [
+    { value: t("about.impact.clean.value", "Clean"), label: t("about.impact.clean.label", "Surroundings"), icon: Recycle },
+    { value: t("about.impact.pickup.value", "Door-to-Door"), label: t("about.impact.pickup.label", "Waste Pickup"), icon: Globe },
+    { value: t("about.impact.smell.value", "No Bad"), label: t("about.impact.smell.label", "Smell or Dumping"), icon: TreeDeciduous },
+    { value: t("about.impact.compost.value", "Organic"), label: t("about.impact.compost.label", "Bio-Compost"), icon: Leaf },
+  ];
+
+  const awards = t("about.awards.items", { returnObjects: true }) as string[];
+  const missionList = t("about.mission.list", { returnObjects: true }) as string[];
+
   return (
     <div className="pt-20">
       {/* Hero Section */}
@@ -90,17 +92,16 @@ export default function About() {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-primary shadow-md font-semibold text-sm mb-6">
               <Heart className="w-4 h-4" />
-              About Us
+              {t("about.hero.badge", "About Us")}
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-6">
-              About BioScrap
+              {t("about.hero.title", "About BioScrap")}
             </h1>
             <p className="text-lg md:text-xl text-primary-foreground/80">
-              Making India clean, green, and sustainable — starting from our own city.
+              {t("about.hero.subtitle", "Making India clean, green, and sustainable — starting from our own city.")}
             </p>
             <p className="mt-4 text-lg md:text-xl text-primary-foreground/80">
-              BioScrap is a waste management and bio-products startup based in Ambajogai. 
-              We believe waste is not useless. When managed properly, waste becomes a valuable resource.
+              {t("about.hero.description", "BioScrap is a waste management and bio-products startup based in Ambajogai. We believe waste is not useless. When managed properly, waste becomes a valuable resource.")}
             </p>
           </motion.div>
         </div>
@@ -117,20 +118,18 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                What We Do
+                {t("about.mission.badge", "What We Do")}
               </span>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-6">
-                Complete Waste Management Solutions
+                {t("about.mission.title", "Complete Waste Management Solutions")}
               </h2>
               <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-                We provide complete waste management solutions for homes, shops, offices, and institutions.
+                {t("about.mission.description", "We provide complete waste management solutions for homes, shops, offices, and institutions.")}
               </p>
               <ul className="space-y-3 text-muted-foreground text-lg leading-relaxed list-disc pl-5">
-                <li>Collect wet waste such as kitchen waste, food waste, and garden waste</li>
-                <li>Collect dry waste such as plastic, paper, metal, and glass</li>
-                <li>Collect scrap and recyclable materials</li>
-                <li>Ensure proper waste segregation</li>
-                <li>Process waste responsibly instead of dumping it in landfills</li>
+                {missionList.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
               </ul>
             </motion.div>
 
@@ -170,10 +169,10 @@ export default function About() {
             className="text-center mb-16"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary text-sm font-medium mb-4">
-              Benefits to You
+              {t("about.impact.badge", "Benefits to You")}
             </span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground">
-              Why Choose BioScrap?
+              {t("about.impact.title", "Why Choose BioScrap?")}
             </h2>
           </motion.div>
 
@@ -211,10 +210,10 @@ export default function About() {
             className="text-center max-w-2xl mx-auto mb-16"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Our Journey
+              {t("about.journey.badge", "Our Journey")}
             </span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">
-              From Idea to Impact
+              {t("about.journey.title", "From Idea to Impact")}
             </h2>
           </motion.div>
 
@@ -255,13 +254,13 @@ export default function About() {
             className="text-center max-w-2xl mx-auto mb-16"
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Our Team
+              {t("about.team.badge", "Our Team")}
             </span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
-              Meet the Green Team
+              {t("about.team.title", "Meet the Green Team")}
             </h2>
             <p className="text-muted-foreground text-lg">
-              Passionate experts dedicated to making bio-waste management accessible and impactful.
+              {t("about.team.subtitle", "Passionate experts dedicated to making bio-waste management accessible and impactful.")}
             </p>
           </motion.div>
 
@@ -298,15 +297,15 @@ export default function About() {
             className="text-center max-w-2xl mx-auto mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
-              Recognized Excellence
+              {t("about.awards.title", "Recognized Excellence")}
             </h2>
             <p className="text-muted-foreground">
-              Our commitment to quality and sustainability has earned us industry recognition.
+              {t("about.awards.subtitle", "Our commitment to quality and sustainability has earned us industry recognition.")}
             </p>
           </motion.div>
 
           <div className="flex flex-wrap justify-center gap-8">
-            {["ISO 14001", "Green Business", "Zero Waste", "Carbon Neutral"].map((cert, index) => (
+            {awards.map((cert, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -335,20 +334,20 @@ export default function About() {
             className="text-center max-w-2xl mx-auto"
           >
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-6">
-              Join Our Green Mission
+              {t("about.cta.title", "Join Our Green Mission")}
             </h2>
             <p className="text-lg text-primary-foreground/80 mb-8">
-              Whether you're a customer, partner, or potential team member, there's a place for you in our sustainable journey.
+              {t("about.cta.description", "Whether you're a customer, partner, or potential team member, there's a place for you in our sustainable journey.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild variant="accent" size="lg">
                 <Link to="/booking">
-                  Start Today
+                  {t("about.cta.start", "Start Today")}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </Button>
               <Button asChild variant="hero-outline" size="lg">
-                <Link to="/contact">Partner With Us</Link>
+                <Link to="/contact">{t("about.cta.partner", "Partner With Us")}</Link>
               </Button>
             </div>
           </motion.div>

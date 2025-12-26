@@ -110,7 +110,7 @@ export default function Services() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary border border-primary/30 text-sm font-medium mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-primary shadow-md font-semibold text-sm mb-6">
               <Recycle className="w-4 h-4" />
               {t('services.hero.badge')}
             </span>
@@ -150,7 +150,7 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className={`relative p-8 rounded-2xl bg-card border transition-all duration-300 hover:shadow-xl overflow-hidden group ${
+                className={`relative p-8 rounded-2xl bg-card border transition-all duration-300 hover:shadow-xl overflow-hidden group flex flex-col ${
                   service.popular
                     ? "border-primary shadow-lg shadow-primary/10"
                     : "border-border/50 hover:border-primary/30"
@@ -160,11 +160,7 @@ export default function Services() {
                   <service.icon className="w-48 h-48 text-primary" />
                 </div>
 
-                {service.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
-                    {t('services.grid.mostPopular')}
-                  </div>
-                )}
+                
                 
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
                   <service.icon className="w-7 h-7 text-primary" />
@@ -186,10 +182,7 @@ export default function Services() {
                   ))}
                 </ul>
                 
-                <div className="flex items-center justify-between pt-6 border-t border-border">
-                  <span className="text-lg font-bold text-primary">
-                    {service.price}
-                  </span>
+                <div className="flex items-center justify-between pt-6 border-t border-border mt-auto">
                   <Button asChild variant={service.popular ? "default" : "outline"} size="sm">
                     <Link to="/booking">{t('services.grid.getStarted')}</Link>
                   </Button>
@@ -267,7 +260,7 @@ export default function Services() {
                 </Link>
               </Button>
               <Button asChild variant="hero-outline" size="lg">
-                <Link to="/pickup-selection">{t('services.cta.schedule')}</Link>
+                <Link to="/booking">{t('services.cta.schedule')}</Link>
               </Button>
             </div>
           </motion.div>

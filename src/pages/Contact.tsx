@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import {
   Mail,
   Phone,
@@ -25,46 +26,20 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
-const contactSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  service: z.string().optional(),
-  message: z.string().min(10, "Message must be at least 10 characters").max(1000),
-});
-
-type ContactFormData = z.infer<typeof contactSchema>;
-
-const contactInfo = [
-  {
-    icon: Phone,
-    title: "Phone",
-    value: "9607195770",
-    description: "Mon-Sat: 8am - 6pm",
-  },
-  {
-    icon: Mail,
-    title: "Email",
-    value: "Bioscrapp@gmail.com",
-    description: "We reply within 24 hours",
-  },
-  {
-    icon: MapPin,
-    title: "Office",
-    value: "Bioscrap Office, Gandhi Nagar, Ambajogai",
-    description: "Tq. Ambajogai, Dist. Beed, Maharashtra – PIN 431517",
-  },
-  {
-    icon: Clock,
-    title: "Working Hours",
-    value: "Mon - Sat",
-    description: "8:00 AM - 6:00 PM",
-  },
-];
-
 export default function Contact() {
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const contactSchema = z.object({
+    name: z.string().min(2, t("validation.minLength", { count: 2, defaultValue: "Name must be at least 2 characters" })).max(100),
+    email: z.string().email(t("validation.email", "Please enter a valid email address")),
+    phone: z.string().min(10, t("validation.phone", "Please enter a valid phone number")),
+    service: z.string().optional(),
+    message: z.string().min(10, t("validation.minLength", { count: 10, defaultValue: "Message must be at least 10 characters" })).max(1000),
+  });
   
+  type ContactFormData = z.infer<typeof contactSchema>;
+
   const {
     register,
     handleSubmit,
@@ -95,8 +70,8 @@ export default function Contact() {
       if (result.success) {
         setIsSubmitted(true);
         toast({
-          title: "Message Sent!",
-          description: "We'll get back to you within 24 hours.",
+          title: t("contact.form.successTitle", "Message Sent!"),
+          description: t("contact.form.successDesc", "We'll get back to you within 24 hours."),
         });
         reset();
         setTimeout(() => setIsSubmitted(false), 5000);
@@ -106,12 +81,39 @@ export default function Contact() {
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
-        title: "Error",
-        description: "Failed to send message. Please try again later.",
+        title: t("errors.title", "Error"),
+        description: t("errors.default", "Failed to send message. Please try again later."),
         variant: "destructive"
       });
     }
   };
+
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: t("contact.info.phone.title", "Phone"),
+      value: t("contact.info.phone.value", "9607195770"),
+      description: t("contact.info.phone.desc", "Mon-Sat: 8am - 6pm"),
+    },
+    {
+      icon: Mail,
+      title: t("contact.info.email.title", "Email"),
+      value: t("contact.info.email.value", "Bioscrapp@gmail.com"),
+      description: t("contact.info.email.desc", "We reply within 24 hours"),
+    },
+    {
+      icon: MapPin,
+      title: t("contact.info.office.title", "Office"),
+      value: t("contact.info.office.value", "Bioscrap Office, Gandhi Nagar, Ambajogai"),
+      description: t("contact.info.office.desc", "Tq. Ambajogai, Dist. Beed, Maharashtra – PIN 431517"),
+    },
+    {
+      icon: Clock,
+      title: t("contact.info.hours.title", "Working Hours"),
+      value: t("contact.info.hours.value", "Mon - Sat"),
+      description: t("contact.info.hours.desc", "8:00 AM - 6:00 PM"),
+    },
+  ];
 
   return (
     <div className="pt-20">
@@ -125,15 +127,15 @@ export default function Contact() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 text-primary border border-primary/30 text-sm font-medium mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-primary shadow-md font-semibold text-sm mb-6">
               <MessageSquare className="w-4 h-4" />
-              Get In Touch
+              {t("contact.hero.badge", "Get In Touch")}
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground mb-6">
-              Let's Start a Conversation
+              {t("contact.hero.title", "Let's Start a Conversation")}
             </h1>
             <p className="text-lg md:text-xl text-primary-foreground/80">
-              Have questions about our services? We're here to help you start your sustainable journey.
+              {t("contact.hero.description", "Have questions about our services? We're here to help you start your sustainable journey.")}
             </p>
           </motion.div>
         </div>
@@ -152,7 +154,7 @@ export default function Contact() {
               className="lg:col-span-2"
             >
               <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-8">
-                Contact Information
+                {t("contact.info.title", "Contact Information")}
               </h2>
               
               <div className="space-y-6 mb-12">
@@ -176,14 +178,7 @@ export default function Contact() {
                   </motion.div>
                 ))}
               </div>
-
-              {/* Map Placeholder */}
-              <div className="rounded-2xl overflow-hidden border border-border/50 h-64 bg-muted flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-12 h-12 text-primary/30 mx-auto mb-2" />
-                  <p className="text-muted-foreground">Interactive map coming soon</p>
-                </div>
-              </div>
+              {/* Map section removed as per request */}
             </motion.div>
 
             {/* Contact Form */}
@@ -196,10 +191,10 @@ export default function Contact() {
             >
               <div className="p-8 lg:p-10 rounded-2xl bg-card border border-border/50 shadow-lg">
                 <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
-                  Send Us a Message
+                  {t("contact.form.title", "Send Us a Message")}
                 </h2>
                 <p className="text-muted-foreground mb-8">
-                  Fill out the form below and we'll get back to you shortly.
+                  {t("contact.form.subtitle", "Fill out the form below and we'll get back to you shortly.")}
                 </p>
 
                 {isSubmitted ? (
@@ -212,10 +207,10 @@ export default function Contact() {
                       <CheckCircle className="w-10 h-10 text-primary" />
                     </div>
                     <h3 className="text-xl font-serif font-bold text-foreground mb-2">
-                      Message Sent Successfully!
+                      {t("contact.form.successTitle", "Message Sent Successfully!")}
                     </h3>
                     <p className="text-muted-foreground">
-                      We'll get back to you within 24 hours.
+                      {t("contact.form.successDesc", "We'll get back to you within 24 hours.")}
                     </p>
                   </motion.div>
                 ) : (
@@ -230,11 +225,11 @@ export default function Contact() {
                     <input type="hidden" name="Website" value="BioScrap – Contact Page" />
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="name">Full Name *</Label>
+                        <Label htmlFor="name">{t("contact.form.name", "Full Name *")}</Label>
                         <Input
                           id="name"
                           name="Name"
-                          placeholder="John Doe"
+                          placeholder={t("contact.form.name", "Full Name")}
                           {...register("name", { required: true })}
                           className="mt-2"
                           required
@@ -246,12 +241,12 @@ export default function Contact() {
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="email">Email Address *</Label>
+                        <Label htmlFor="email">{t("contact.form.email", "Email Address *")}</Label>
                         <Input
                           id="email"
                           name="Email"
                           type="email"
-                          placeholder="john@example.com"
+                          placeholder={t("contact.form.email", "Email Address")}
                           {...register("email", { required: true })}
                           className="mt-2"
                           required
@@ -266,12 +261,12 @@ export default function Contact() {
 
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="phone">Phone Number *</Label>
+                        <Label htmlFor="phone">{t("contact.form.phone", "Phone Number *")}</Label>
                         <Input
                           id="phone"
                           name="Phone"
                           type="tel"
-                          placeholder="9607195770"
+                          placeholder={t("contact.form.phone", "Mobile Number")}
                           {...register("phone", { required: true })}
                           className="mt-2"
                           required
@@ -283,31 +278,31 @@ export default function Contact() {
                         )}
                       </div>
                       <div>
-                        <Label htmlFor="service">Service Interest</Label>
+                        <Label htmlFor="service">{t("contact.form.service", "Service Interest")}</Label>
                         <Select 
                           name="Service"
                           onValueChange={(value) => setValue("service", value)}
                         >
                           <SelectTrigger className="mt-2">
-                            <SelectValue placeholder="Select a service" />
+                            <SelectValue placeholder={t("contact.form.servicePlaceholder", "Select a service")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="collection">Waste Collection</SelectItem>
-                            <SelectItem value="composting">Bio-Composting</SelectItem>
-                            <SelectItem value="analytics">Waste Analytics</SelectItem>
-                            <SelectItem value="containers">Container Rental</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="waste-collection">{t("contact.form.services.waste", "Waste Collection")}</SelectItem>
+                            <SelectItem value="scrap-collection">{t("contact.form.services.scrap", "Scrap Collection")}</SelectItem>
+                            <SelectItem value="composting">{t("contact.form.services.composting", "Bio-Composting")}</SelectItem>
+                            <SelectItem value="containers">{t("contact.form.services.containers", "Container Rental")}</SelectItem>
+                            <SelectItem value="other">{t("contact.form.services.other", "Other")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="message">Your Message *</Label>
+                      <Label htmlFor="message">{t("contact.form.message", "Your Message *")}</Label>
                       <Textarea
                         id="message"
                         name="Message"
-                        placeholder="Tell us how we can help you..."
+                        placeholder={t("contact.form.messagePlaceholder", "Tell us how we can help you")}
                         rows={5}
                         {...register("message", { required: true })}
                         className="mt-2"
@@ -328,10 +323,10 @@ export default function Contact() {
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
-                        <>Sending...</>
+                        <>{t("contact.form.sending", "Sending...")}</>
                       ) : (
                         <>
-                          Send Message
+                          {t("contact.form.submit", "Send Message")}
                           <Send className="w-5 h-5" />
                         </>
                       )}
@@ -349,13 +344,13 @@ export default function Contact() {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center">
             <h3 className="text-xl font-serif font-bold text-foreground mb-2">
-              Looking for quick answers?
+              {t("contact.faq.title", "Looking for quick answers?")}
             </h3>
             <p className="text-muted-foreground mb-4">
-              Check out our frequently asked questions for instant help.
+              {t("contact.faq.subtitle", "Check out our frequently asked questions for instant help.")}
             </p>
             <Button variant="outline" size="lg">
-              View FAQs
+              {t("contact.faq.button", "View FAQs")}
             </Button>
           </div>
         </div>

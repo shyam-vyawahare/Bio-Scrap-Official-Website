@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Cart() {
   const { items, removeItem, updateQty, total } = useCart();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="pt-20 min-h-screen">
@@ -19,10 +21,10 @@ export default function Cart() {
             className="text-center max-w-3xl mx-auto"
           >
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground mb-4">
-              Your Cart
+              {t('cartPage.title')}
             </h1>
             <p className="text-primary-foreground/80">
-              Review your items and proceed to checkout.
+              {t('cartPage.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -31,10 +33,10 @@ export default function Cart() {
       <div className="container mx-auto px-4 lg:px-8 py-12 max-w-5xl">
         {items.length === 0 ? (
           <div className="max-w-lg mx-auto text-center">
-            <div className="text-2xl font-serif font-bold mb-2">Your cart is empty</div>
-            <p className="text-muted-foreground mb-6">Add products from the shop and they will appear here.</p>
+            <div className="text-2xl font-serif font-bold mb-2">{t('cartPage.empty')}</div>
+            <p className="text-muted-foreground mb-6">{t('cartPage.emptyDesc')}</p>
             <Button asChild>
-              <Link to="/shop">Go to Shop</Link>
+              <Link to="/shop">{t('cartPage.goToShop')}</Link>
             </Button>
           </div>
         ) : (
@@ -70,20 +72,20 @@ export default function Cart() {
               <h3 className="text-lg font-semibold mb-4">Bill Summary</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">{t('cartPage.subtotal')}</span>
                   <span className="font-medium">₹{total}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Delivery</span>
+                  <span className="text-muted-foreground">{t('cartPage.delivery')}</span>
                   <span className="font-medium">₹0</span>
                 </div>
                 <div className="pt-3 border-t flex items-center justify-between">
-                  <span className="text-foreground font-semibold">Total</span>
+                  <span className="text-foreground font-semibold">{t('cartPage.total')}</span>
                   <span className="text-foreground font-bold">₹{total}</span>
                 </div>
               </div>
               <Button className="w-full mt-6" onClick={() => navigate("/checkout")}>
-                Place Order
+                {t('cartPage.checkout')}
               </Button>
             </div>
           </div>

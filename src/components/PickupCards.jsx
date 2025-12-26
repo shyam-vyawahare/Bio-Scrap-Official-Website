@@ -39,9 +39,6 @@ const PickupCards = () => {
               {t('pickupCards.waste.badge') || "COMING SOON"}
             </div>
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-600/5" />
-            <div className="absolute -right-10 -bottom-10 opacity-[0.05] rotate-12">
-              <Leaf className="w-64 h-64 text-green-600" />
-            </div>
             
             <div className="relative p-8 h-full flex flex-col grayscale-[0.5]">
               <div className="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-6">
